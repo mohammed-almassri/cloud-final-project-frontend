@@ -17,7 +17,7 @@ export function makeServer() {
       this.namespace = "api";
 
       // Register (Sign Up)
-      this.post("/register", (schema, request) => {
+      this.post("/register", (_, request) => {
         const { email, name, password, profileImage } = JSON.parse(
           request.requestBody
         );
@@ -48,7 +48,7 @@ export function makeServer() {
       });
 
       // Login
-      this.post("/login", (schema, request) => {
+      this.post("/login", (_, request) => {
         console.log(request.requestBody);
         const { email, password } = JSON.parse(request.requestBody);
         const user = users.find(
@@ -71,7 +71,7 @@ export function makeServer() {
       });
 
       // Get Current User (Mock authentication)
-      this.get("/user/:id", (schema, request) => {
+      this.get("/user/:id", (_, request) => {
         const userId = request.params.id;
         const user = users.find((u) => u.id === userId);
 
@@ -94,7 +94,7 @@ export function makeServer() {
       });
 
       // Update Profile
-      this.put("/user/:id", (schema, request) => {
+      this.put("/user/:id", (_, request) => {
         const userId = request.params.id;
         const { name, profileImage } = JSON.parse(request.requestBody);
         const user = users.find((u) => u.id === userId);
