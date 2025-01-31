@@ -113,6 +113,48 @@ export function makeServer() {
           profileImage: user.profileImage,
         };
       });
+
+      // Simulate Generating an S3 Signed URL
+      this.get("/s3/sign-url", (_, request) => {
+        const fileType = request.queryParams.fileType;
+
+        if (!fileType) {
+          return new Response(400, {}, { error: "File type is required" });
+        }
+
+        // Mock an S3 signed URL response
+        const signedUrl = `https://mock-s3-bucket.s3.amazonaws.com/uploads/${crypto.randomUUID()}?AWSAccessKeyId=mockAccessKey&Expires=3600&Signature=mockSignature`;
+
+        return {
+          url: signedUrl,
+          fields: {
+            key: `uploads/${crypto.randomUUID()}`,
+            AWSAccessKeyId: "mockAccessKey",
+            policy: "mockPolicy",
+            signature: "mockSignature",
+          },
+        };
+      });
+
+      // Update User Profile Image
+      this.put("/user/:id/profile-image", (_, request) => {
+        const userId = request.params.id;
+        const { profileImage } = JSON.parse(request.requestBody);
+        const user = users.find((u) => u.id === userId);
+
+        if (!user) {
+          return new Response(404, {}, { error: "User not found" });
+        }
+
+        user.profileImage = profileImage;
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          profileImage: user.profileImage,
+        };
+      });
     },
   });
 }
