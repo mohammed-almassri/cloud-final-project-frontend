@@ -1,10 +1,15 @@
 import { AuthResponse, LoginData, RegisterData } from "../types";
 
 export const register = async (data: RegisterData): Promise<AuthResponse> => {
-  const res = await fetch(import.meta.env.VITE_API_BASE_URL + "/register", {
+  const res = await fetch(import.meta.env.VITE_API_BASE_URL + "/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      email: data.email,
+      password: data.password,
+      name: data.name,
+      profileImage: data.image64,
+    }),
   });
 
   if (!res.ok) {

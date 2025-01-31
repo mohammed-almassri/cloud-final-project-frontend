@@ -6,7 +6,23 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [image, setImage] = useState("");
   const [error, setError] = useState("");
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const base64Image = e.target!.result; // This gives you the base64 string
+        // Send this to your API
+        setImage(base64Image as string);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,6 +31,7 @@ export default function Register() {
         name,
         email,
         password,
+        image64: image,
       });
     } catch (err) {
       setError("Failed to create an account");
@@ -24,7 +41,7 @@ export default function Register() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 rounded  w-full max-w-sm"
+      className="bg-white p-6 rounded w-full max-w-sm"
     >
       <h2 className="text-2xl font-bold mb-4">Register</h2>
       {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -35,7 +52,7 @@ export default function Register() {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="name"
+          placeholder="Name"
         />
       </div>
       <div className="mb-4">
@@ -45,7 +62,7 @@ export default function Register() {
           onChange={(e) => setEmail(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded mt-1"
           required
-          placeholder="email"
+          placeholder="Email"
         />
       </div>
       <div className="mb-4">
@@ -55,7 +72,15 @@ export default function Register() {
           onChange={(e) => setPassword(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded mt-1"
           required
-          placeholder="password"
+          placeholder="Password"
+        />
+      </div>
+      <div className="mb-4">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="w-full p-2 border border-gray-300 rounded mt-1"
         />
       </div>
       <button
