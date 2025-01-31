@@ -1,11 +1,11 @@
-import { useState } from "react";
+// import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { signUrl } from "../api/s3";
 import { updateProfileImage } from "../api/profile";
 
 export default function Home() {
   const { user, logout } = useAuth();
-  const [uploading, setUploading] = useState<boolean>(false);
+  // const [uploading, setUploading] = useState<boolean>(false);
 
   const onAvatarClicked = () => {
     const fileInput = document.createElement("input");
@@ -22,7 +22,7 @@ export default function Home() {
   };
 
   const handleUpload = async (file: File) => {
-    setUploading(true);
+    // setUploading(true);
 
     try {
       // Step 1: Get signed URL from the mock API
@@ -54,7 +54,7 @@ export default function Home() {
       console.error("Error:", error);
       alert("Something went wrong!");
     } finally {
-      setUploading(false);
+      // setUploading(false);
     }
   };
 
