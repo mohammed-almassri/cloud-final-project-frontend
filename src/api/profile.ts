@@ -1,12 +1,11 @@
+import { API_BASE_URL } from "../util/constants";
+
 export const updateProfileImage = async (id: string, image: string) => {
-  const res = await fetch(
-    import.meta.env.VITE_API_BASE_URL + `/user/${id}/profile-image`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, image }),
-    }
-  );
+  const res = await fetch(API_BASE_URL + `/user/${id}/profile-image`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, image }),
+  });
 
   if (!res.ok) {
     const error = await res.json();

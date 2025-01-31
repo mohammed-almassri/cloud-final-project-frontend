@@ -1,7 +1,8 @@
 import { AuthResponse, LoginData, RegisterData } from "../types";
+import { API_BASE_URL } from "../util/constants";
 
 export const register = async (data: RegisterData): Promise<AuthResponse> => {
-  const res = await fetch(import.meta.env.VITE_API_BASE_URL + "/signup", {
+  const res = await fetch(API_BASE_URL + "/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -21,7 +22,7 @@ export const register = async (data: RegisterData): Promise<AuthResponse> => {
 };
 
 export const login = async (data: LoginData): Promise<AuthResponse> => {
-  const res = await fetch(import.meta.env.VITE_API_BASE_URL + "/login", {
+  const res = await fetch(API_BASE_URL + "/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),

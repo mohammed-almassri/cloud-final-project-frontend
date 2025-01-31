@@ -1,7 +1,6 @@
 // import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { signUrl } from "../api/s3";
-import { updateProfileImage } from "../api/profile";
+// import { updateProfileImage } from "../api/profile";
 
 export default function Home() {
   const { user, logout } = useAuth();
@@ -15,47 +14,10 @@ export default function Home() {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (file) {
         console.log(`Selected file size: ${file.size} bytes`);
-        handleUpload(file);
+        // handleUpload(file);
       }
     };
     fileInput.click();
-  };
-
-  const handleUpload = async (file: File) => {
-    // setUploading(true);
-
-    try {
-      // Step 1: Get signed URL from the mock API
-      const response = await signUrl(file.type);
-      const { url, fields } = response;
-
-      // Step 2: Upload file to S3 using signed URL
-      const formData = new FormData();
-      Object.entries(fields).forEach(([key, value]) => {
-        formData.append(key, value as string);
-      });
-      formData.append("file", file);
-
-      const uploadResponse = await fetch(url, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error("Failed to upload image to S3.");
-      }
-
-      // Step 3: Get the uploaded file URL
-      const imageUrl = url.split("?")[0];
-
-      // Step 4: Update user profile with the new image
-      await updateProfileImage(user!.id || "", imageUrl);
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Something went wrong!");
-    } finally {
-      // setUploading(false);
-    }
   };
 
   return (
