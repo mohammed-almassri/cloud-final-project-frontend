@@ -1,10 +1,13 @@
 import { API_BASE_URL } from "../util/constants";
 
-export const updateProfileImage = async (id: string, image: string) => {
-  const res = await fetch(API_BASE_URL + `/user/${id}/profile-image`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id, image }),
+export const updateProfileImage = async (image: string) => {
+  const res = await fetch(API_BASE_URL + `/profile-image`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: JSON.stringify({ profileImage: image }),
   });
 
   if (!res.ok) {
