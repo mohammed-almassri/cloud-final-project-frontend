@@ -12,8 +12,8 @@ type AuthContextType = {
   user: User | null;
   token: string | null;
   loadOrSaveToken: (callback: (() => Promise<AuthResponse>) | null) => void;
-  register: (user: RegisterData) => Promise<AuthResponse>;
-  login: (data: LoginData) => Promise<AuthResponse>;
+  register: (user: RegisterData) => Promise<void>;
+  login: (data: LoginData) => Promise<void>;
   logout: () => void;
 };
 
