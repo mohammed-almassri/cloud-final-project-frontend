@@ -8,7 +8,7 @@ Resources:
       BucketName: !Sub "${AWS::AccountId}-frontend-s3"
       WebsiteConfiguration:
         IndexDocument: index.html
-        ErrorDocument: index.html
+        ErrorDocument: index.html ## needed?
 
       # Block all public access:
       PublicAccessBlockConfiguration:
@@ -17,6 +17,33 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
 
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "arn:aws:s3:::${FrontendBucket}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+
+    Properties:
+      OriginAccessControlConfig:
+        Name: "OAC for Frontend S3"
+        Description: "Allows CloudFront to access the S3 bucket"
+        SigningProtocol: sigv4
+        SigningBehavior: always
+        OriginAccessControlOriginType: s3
 
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
@@ -26,5 +53,12 @@ Resources:
         Origins:
           - DomainName: !GetAtt FrontendBucket.DomainName
             Id: S3Origin
-            S3OriginConfig:
-              OriginAccessIdentity: ""    # whats that?
+            OriginAccessControlId: !Ref CloudFrontOAC
+            S3OriginConfig: {} # required when usings S3 as origin
+        Enabled: true # enables the distribution to be active
+
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+        PriceClass: PriceClass_100
