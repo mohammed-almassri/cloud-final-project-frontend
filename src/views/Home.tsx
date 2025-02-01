@@ -44,7 +44,7 @@ export default function Home() {
                     : user?.profileImage || "/no-image.png"
                 }
                 alt="avatar"
-                className={`w-16 h-16 sm:w-48 sm:h-48 rounded-md inline ${
+                className={`w-32 h-32 sm:w-48 sm:h-48 rounded-md inline ${
                   uploading ? "opacity-50" : ""
                 }`}
               />
@@ -59,7 +59,7 @@ export default function Home() {
             </div> */}
 
               <div
-                className={`absolute top-[0%] left-[-20%] text-amber-500 z-50 font-bold border border-amber-500 rounded-md p-1 rotate-[-45deg] bg-amber-100
+                className={`text-xs absolute top-[0%] left-[-20%] text-amber-500 z-50 font-bold border border-amber-500 rounded-md p-1 rotate-[-45deg] bg-amber-100
                    ${uploading ? "opacity-0" : "opacity-100"}`}
               >
                 click to update
@@ -68,8 +68,12 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col justify-center">
-            <h1 className="text-4xl font-bold">Welcome, {user?.name}</h1>
-            <p className="mt-2 text-2xl">{user?.email}</p>
+            <h1 className="text-lg md:text-4xl font-bold">
+              Welcome, {user?.name}
+            </h1>
+            <p className="mt-2 text-md md:text-lg text-ellipsis">
+              {user?.email}
+            </p>
           </div>
         </div>
       </div>
