@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import APIError from "../errors/APIError";
+import encode from "../util/encode";
 
 export default function Register() {
   const { register } = useAuth();
@@ -12,18 +13,11 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-
-      reader.onload = function (e) {
-        const base64Image = e.target!.result; // This gives you the base64 string
-        // Send this to your API
-        setImage(base64Image as string);
-      };
-
-      reader.readAsDataURL(file);
+      const image64 = await encode(file);
+      setImage(image64);
     }
   };
 

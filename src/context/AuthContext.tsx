@@ -8,12 +8,14 @@ import {
 import User from "../models/User";
 import { AuthResponse, LoginData, RegisterData } from "../types";
 import * as auth from "../api/auth";
+import * as profile from "../api/profile";
 type AuthContextType = {
   user: User | null;
   token: string | null;
   loadOrSaveToken: (callback: (() => Promise<AuthResponse>) | null) => void;
   register: (user: RegisterData) => Promise<void>;
   login: (data: LoginData) => Promise<void>;
+  updateProfileImage: (image: string) => Promise<void>;
   logout: () => void;
 };
 
@@ -55,6 +57,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     return loadOrSaveToken(async () => await auth.login(data));
   };
 
+  const updateProfileImage = async (image: string) => {
+    const res = await profile.updateProfileImage(image);
+    setUser({
+      ...user!,
+      profileImage: res.profileImage,
+    });
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -69,6 +79,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     loadOrSaveToken,
+    updateProfileImage,
   };
 
   useEffect(() => {
