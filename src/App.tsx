@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import Home from "./views/Home.tsx";
 import AuthLayout from "./layouts/AuthLayout.tsx";
 import Login from "./views/Login.tsx";
