@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
 import { useState } from "react";
@@ -54,6 +55,10 @@ export default function Login() {
       >
         Login
       </button>
+
+      <Link to="/register" className="block mt-4 text-blue-900">
+        Don't have an account? <span className="underline">Register</span>
+      </Link>
     </form>
   );
 }
