@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
+import APIError from "../errors/APIError";
 
 export default function Register() {
   const { register } = useAuth();
@@ -9,6 +10,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [image, setImage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -27,6 +29,7 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await register({
         name,
@@ -35,7 +38,13 @@ export default function Register() {
         image64: image,
       });
     } catch (err) {
-      setError("Failed to create an account");
+      if (err instanceof APIError) {
+        setError(err.message);
+      } else {
+        setError("Failed to register. Please check the details and try again.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,7 +54,6 @@ export default function Register() {
       className="bg-white p-6 rounded w-full max-w-sm"
     >
       <h2 className="text-2xl font-bold mb-4">Register</h2>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
       <div className="mb-4">
         <input
           type="text"
@@ -84,11 +92,14 @@ export default function Register() {
           className="w-full p-2 border border-gray-300 rounded mt-1"
         />
       </div>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+
       <button
+        disabled={loading}
         type="submit"
-        className="w-full bg-blue-500 text-white p-2 rounded"
+        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:opacity-50"
       >
-        Register
+        {loading ? "Loading..." : "Register"}
       </button>
       <Link to="/login" className="block mt-4 text-blue-900">
         Already have an account? <span className="underline">Login</span>

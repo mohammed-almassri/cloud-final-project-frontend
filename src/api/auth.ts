@@ -1,3 +1,4 @@
+import APIError from "../errors/APIError";
 import { AuthResponse, LoginData, RegisterData } from "../types";
 import { API_BASE_URL } from "../util/constants";
 
@@ -14,10 +15,17 @@ export const register = async (data: RegisterData): Promise<AuthResponse> => {
   });
 
   if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error);
+    let errorMessage = "An unknown error occurred";
+    try {
+      const errorResponse = await res.json();
+      if (errorResponse && errorResponse.message) {
+        errorMessage = errorResponse.message;
+      }
+    } catch (_) {
+      errorMessage = res.statusText || errorMessage;
+    }
+    throw new APIError(errorMessage, res.status);
   }
-
   return (await res.json()) as AuthResponse;
 };
 
@@ -29,8 +37,16 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
   });
 
   if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error);
+    let errorMessage = "An unknown error occurred";
+    try {
+      const errorResponse = await res.json();
+      if (errorResponse && errorResponse.message) {
+        errorMessage = errorResponse.message;
+      }
+    } catch (_) {
+      errorMessage = res.statusText || errorMessage;
+    }
+    throw new APIError(errorMessage, res.status);
   }
 
   return (await res.json()) as AuthResponse;
