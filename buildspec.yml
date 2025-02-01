@@ -12,5 +12,5 @@ artifacts:
     - '**/*'
   name: react-app-build
   discard-paths: no
-  base-directory: build  
+  base-directory: dist  
   acl: bucket-owner-full-control

@@ -12,8 +12,8 @@ type AuthContextType = {
   user: User | null;
   token: string | null;
   loadOrSaveToken: (callback: (() => Promise<AuthResponse>) | null) => void;
-  register: (user: RegisterData) => void;
-  login: (data: LoginData) => void;
+  register: (user: RegisterData) => Promise<AuthResponse>;
+  login: (data: LoginData) => Promise<AuthResponse>;
   logout: () => void;
 };
 
@@ -48,11 +48,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (user: RegisterData) => {
-    loadOrSaveToken(async () => await auth.register(user));
+    return loadOrSaveToken(async () => await auth.register(user));
   };
 
   const login = async (data: LoginData) => {
-    loadOrSaveToken(async () => await auth.login(data));
+    return loadOrSaveToken(async () => await auth.login(data));
   };
 
   const logout = () => {
