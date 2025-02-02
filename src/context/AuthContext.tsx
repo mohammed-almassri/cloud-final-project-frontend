@@ -59,9 +59,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateProfileImage = async (image: string) => {
     const res = await profile.updateProfileImage(image);
-    setUser({
-      ...user!,
-      profileImage: res.profileImage,
+    setUser((prev) => {
+      const newUser = {
+        ...prev!,
+        profileImage: res.profileImage,
+      };
+      localStorage.setItem("user", JSON.stringify(newUser));
+      return newUser;
     });
   };
 
