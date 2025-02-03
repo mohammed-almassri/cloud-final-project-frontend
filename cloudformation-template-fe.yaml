@@ -38,6 +38,7 @@ Resources:
 
     Properties:
       DistributionConfig:
+        Comment: "Frontend CloudFront Distribution"
         Origins:
           - DomainName: !GetAtt FrontendBucket.DomainName
             Id: S3Origin
@@ -182,7 +183,16 @@ Resources:
               - Effect: Allow
                 Action:
                   - codebuild:StartBuild
+                  - codebuild:BatchGetBuilds
+                  - codebuild:ListBuilds
                 Resource: arn:aws:codebuild:us-east-1:982534378644:project/FrontendBuild
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                  - lambda:GetFunction
+                  - lambda:UpdateFunctionCode
+                  - lambda:UpdateFunctionConfiguration
+                Resource: !GetAtt CloudFrontInvalidationFunction.Arn
 
   # IAM Role for CodeBuild
   # (Codebuild is used by the project, the project is used by the pipeline)
@@ -219,36 +229,83 @@ Resources:
                   - codebuild:BatchGetBuilds
                 Resource: "*"
 
-    # CloudFront Cache Invalidation Lambda (Optional)
+  # CloudFront Cache Invalidation Lambda
   CloudFrontInvalidationFunction:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: InvalidateCloudFrontCache
-      Runtime: python3.9
-      Handler: index.lambda_handler
+      Runtime: nodejs18.x
+      Handler: index.lambdaHandler
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ZipFile: |
-          import json
-          import boto3
-          import os
-          import time
+          const { CloudFrontClient, CreateInvalidationCommand } = require("@aws-sdk/client-cloudfront");
+          const { CodePipelineClient, PutJobSuccessResultCommand, PutJobFailureResultCommand } = require("@aws-sdk/client-codepipeline");
+          const crypto = require("crypto");
 
-          def lambda_handler(event, context):
-              client = boto3.client('cloudfront')
-              distribution_id = os.environ['CLOUDFRONT_DISTRIBUTION_ID']
-              client.create_invalidation(
-                  DistributionId=distribution_id,
-                  InvalidationBatch={
-                      'Paths': {'Quantity': 1, 'Items': ['/*']},
-                      'CallerReference': str(time.time())
-                  }
-              )
-              return {"statusCode": 200, "body": json.dumps("Invalidation created.")}
+          const client = new CloudFrontClient({});
+          const codePipelineClient = new CodePipelineClient({});
+          const time = crypto.randomBytes(8).toString("hex");
+
+          exports.lambdaHandler = async (event) => {
+            try {
+              const distributionId = process.env.CLOUDFRONT_DISTRIBUTION_ID;
+              const jobId = event["CodePipeline.job"]?.id;  // Extract CodePipeline job ID
+
+              const params = {
+                DistributionId: distributionId,
+                InvalidationBatch: {
+                  Paths: {
+                    Quantity: 1,
+                    Items: ["/*"],
+                  },
+                  CallerReference: time,
+                },
+              };
+
+              await client.send(new CreateInvalidationCommand(params));
+
+              if (jobId) {
+                await codePipelineClient.send(new PutJobSuccessResultCommand({ jobId }));
+                console.log("Reported success to CodePipeline.");
+              }
+              console.log("CloudFront invalidation created successfully.");
+
+              return {
+                statusCode: 200,
+                body: JSON.stringify({ 
+                  status: "Succeeded",
+                  message: "Succeeded" 
+                  }),
+              };
+            } catch (error) {
+              console.error("Error creating invalidation:", error);
+
+              if (jobId) {
+                await codePipelineClient.send(new PutJobFailureResultCommand({
+                    jobId,
+                    failureDetails: { message: error.message, type: "JobFailed" }
+                }));
+              }
+              
+              return {
+                statusCode: 500,
+                body: JSON.stringify({ 
+                  status: "Failed",
+                  error: "Failed to create invalidation." 
+                }),
+              };
+            }
+          };
+      Environment:
+        Variables:
+          CLOUDFRONT_DISTRIBUTION_ID: !Ref CloudFrontDistribution
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
+
     Properties:
+      RoleName: InvalidateCacheRoleForLambda
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -271,3 +328,8 @@ Resources:
                 Action:
                   - cloudfront:CreateInvalidation
                 Resource: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+              - Effect: Allow
+                Action:
+                  - "codepipeline:PutJobSuccessResult"
+                  - "codepipeline:PutJobFailureResult"
+                Resource: "*"
