@@ -185,7 +185,7 @@ Resources:
                   - codebuild:StartBuild
                   - codebuild:BatchGetBuilds
                   - codebuild:ListBuilds
-                Resource: arn:aws:codebuild:us-east-1:982534378644:project/FrontendBuild
+                Resource: !Sub "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/FrontendBuild"
               - Effect: Allow
                 Action:
                   - lambda:InvokeFunction
