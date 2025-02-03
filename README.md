@@ -1,50 +1,41 @@
-# React + TypeScript + Vite
+## Cloud Computing Final Project Group 9
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Frontend
 
-Currently, two official plugins are available:
+## Description
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+We created a 'cloudformation-template-fe.yaml' file,
+that can used in an AWS stack.
+This stack automatically creates an entire CodePipeline,
+and the necessary ressources
+(S3-Bucket, CloudFormation distribution, Lambda for Cache Invalidation, and their Roles)
+for the Frontend.
 
-## Expanding the ESLint configuration
+The Pipeline is connected to the GitHub-Repo (Source), so every time a push is made,
+the frontend is redeployed automatically.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Instructions for deploying the Frontend
 
-- Configure the top-level `parserOptions` property like this:
+1. Fork the GitHub-Repo to your account:
+   https://github.com/bennetstrauch/cloud-final-project-frontend
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+2. Ceate a GitHub-Connection
+   (if you already have a connection that can access all your github repos you can use this one)
+   Open your AWS-Console --> CodePipeline --> Settings --> Connections --> Create Connection
+   When you are asked to select an app --> Install a new app --> Repository access: Choose All repositories OR Select your forked repository from step 1.
+   After creation, copy the connection Arn (arn:aws:codeconnections:....)
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+3. Replace your own connection Arn with the one in the .yaml-template
+   Search the cloudformation-template-fe.yaml for ConnectionArn and replace with your own Arn (Line 92)
+4. In same file, one Line below, at: 'FullRepositroyId', Replace the Github-repo-Link with your own forked  
+   repo from step 1. Save file.
+   (This step is necessary because one needs admin right to the repo so that the Pipeline can automatically deploy on pushes)
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+5. Create Stack in AWS
+   In your AWS-console, open CloudFormation --> Create Stack --> With new ressources --> Upload a template file --> Choose the in previous steps modified .yaml-file --> ALl other settings can be left default
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+6. Access your Cloudfront
+   After Stack creation is finished:
+   AWS-Console --> Cloudfront --> Click on distribution with description: 'Frontend CloudFront distribution',
+   copy 'Distribution Domain Name' and open in your Browser
+   Tadaaaaa!
