@@ -89,8 +89,8 @@ Resources:
                 Provider: CodeStarSourceConnection
                 Version: 1
               Configuration:
-                ConnectionArn: arn:aws:codeconnections:us-east-1:982534378644:connection/6761f8a0-793b-42dd-91d8-fc0ef52fcffe
-                FullRepositoryId: bennetstrauch/cloud-final-project-frontend
+                ConnectionArn: arn:aws:codeconnections:us-east-1:050752607919:connection/242f5fc5-afd5-4ee5-b6fa-f6201bcc255d
+                FullRepositoryId: mohammed-almassri/cloud-final-project-frontend
                 BranchName: master
                 OutputArtifactFormat: CODE_ZIP
               OutputArtifacts:
@@ -179,7 +179,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - codestar-connections:UseConnection
-                Resource: "arn:aws:codeconnections:us-east-1:982534378644:connection/6761f8a0-793b-42dd-91d8-fc0ef52fcffe"
+                Resource: "arn:aws:codeconnections:us-east-1:050752607919:connection/242f5fc5-afd5-4ee5-b6fa-f6201bcc255d"
               - Effect: Allow
                 Action:
                   - codebuild:StartBuild

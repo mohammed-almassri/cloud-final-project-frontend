@@ -1,6 +1,25 @@
-## Cloud Computing Final Project Group 9
+# Cloud Computing Final Project Group 9
 
 ## Frontend
+
+this project is used to authenticate users and optionally update their profile picture.
+
+built with React and Vite. Deployed on AWS CloudFront.
+
+### Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+open [http://localhost:3000](http://localhost:3000) in your browser
+
+### production build
+
+```bash
+npm run build
+```
 
 ## Description
 
